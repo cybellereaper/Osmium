@@ -1,0 +1,40 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-labelledby="title desc">
+  <title id="title">Osmium logo</title>
+  <desc id="desc">A faceted violet crystal surrounded by an orbital ring.</desc>
+  <defs>
+    <linearGradient id="crystal" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#f4f1ff"/>
+      <stop offset="0.42" stop-color="#b7a8ff"/>
+      <stop offset="1" stop-color="#6d5bd0"/>
+    </linearGradient>
+    <linearGradient id="facet" x1="0" y1="1" x2="1" y2="0">
+      <stop offset="0" stop-color="#5b49b8"/>
+      <stop offset="1" stop-color="#d9d1ff"/>
+    </linearGradient>
+    <linearGradient id="orbit" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#7561db"/>
+      <stop offset="0.5" stop-color="#eeeaff"/>
+      <stop offset="1" stop-color="#7561db"/>
+    </linearGradient>
+  </defs>
+
+  <g fill="none" stroke-linecap="round" stroke-linejoin="round">
+    <ellipse cx="256" cy="270" rx="188" ry="74" transform="rotate(-22 256 270)" stroke="url(#orbit)" stroke-width="15"/>
+    <path d="M86 314c54 30 128 42 210 22 80-20 126-63 151-102" stroke="#f7f5ff" stroke-opacity="0.78" stroke-width="4"/>
+  </g>
+
+  <g stroke="#f4f1ff" stroke-opacity="0.35" stroke-width="2">
+    <polygon points="256,52 177,222 256,410 335,222" fill="url(#crystal)"/>
+    <polygon points="256,52 256,410 177,222" fill="#8f7de7"/>
+    <polygon points="256,52 335,222 256,246" fill="#efeaff"/>
+    <polygon points="256,246 335,222 256,410" fill="#6652c4"/>
+    <polygon points="177,222 256,246 256,410" fill="url(#facet)"/>
+    <polygon points="177,222 256,52 225,225" fill="#c9beff" fill-opacity="0.84"/>
+  </g>
+
+  <g fill="#eeeaff">
+    <path d="M110 139l8 20 20 8-20 8-8 20-8-20-20-8 20-8z"/>
+    <path d="M413 107l5 13 13 5-13 5-5 13-5-13-13-5 13-5z"/>
+    <circle cx="403" cy="350" r="7"/>
+  </g>
+</svg>
