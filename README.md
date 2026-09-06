@@ -1,217 +1,175 @@
+<img align="right" width="220" src="docs/assets/osmium-logo.svg" alt="Osmium logo">
+
 # Osmium
 
-Osmium is a clean-room, ModelEngine-style Blockbench renderer for Paper Minecraft servers.
+**Bring Blockbench models to life on modern Paper servers.**
 
-It loads `.bbmodel` files, converts model parts into resource-pack item models, and renders them in-game with Bukkit display entities. Osmium is built for modern Paper servers and is designed for custom models, animated runtime entities, generated resource packs, and model hitboxes.
+Osmium is an open-source, clean-room, ModelEngine-style renderer for Paper Minecraft servers. It loads Blockbench `.bbmodel` files, compiles their parts into Minecraft resource-pack assets, and renders animated models with native display entities.
+
+Osmium is built around a simple workflow: **drop in a model, reload, generate the pack, and spawn it**. It does not require ModelEngine.
+
+[![Java 25](https://img.shields.io/badge/Java-25-orange?logo=openjdk)](https://openjdk.org/)
+[![Paper 26.1](https://img.shields.io/badge/Paper-26.1-2f3136)](https://papermc.io/)
+[![Latest release](https://img.shields.io/github/v/release/aliceblackrose/osmium?label=release)](https://github.com/aliceblackrose/osmium/releases/latest)
+[![JitPack](https://jitpack.io/v/aliceblackrose/osmium.svg)](https://jitpack.io/#aliceblackrose/osmium)
+[![GPL-3.0](https://img.shields.io/github/license/aliceblackrose/osmium)](LICENSE)
+
+<br clear="right">
+
+> [!IMPORTANT]
+> Osmium is under active development. Model loading, rendering behavior, configuration, and the public API may change between releases.
 
 ## Features
 
-- Load Blockbench `.bbmodel` files
-- Generate Minecraft resource packs automatically
-- Spawn runtime models in-game
-- Attach models to living mobs
-- Play model animations
-- Generate item model data from model parts
-- Support model hitboxes through interaction entities
-- Use native display shadows with automatic model-footprint sizing
-- Debug loaded models, textures, UVs, cubes, and animations
-- Rolling `latest` GitHub release builds
+- **Blockbench model loading** — load `.bbmodel` files directly from the plugin's blueprint directory.
+- **Display-entity rendering** — render model parts with native Bukkit/Paper display entities.
+- **Animation playback** — play animations embedded in loaded Blockbench models.
+- **Mob attachment** — attach runtime models to living entities.
+- **Automatic resource-pack generation** — generate item models, textures, custom model data, and distributable pack archives.
+- **Model hitboxes** — create interaction entities for custom model hitboxes.
+- **Native shadows** — render one automatically sized display shadow per model.
+- **Debug tooling** — inspect loaded models, cubes, textures, UVs, animations, and hitboxes in-game.
 
 ## Requirements
 
-- Java 25
-- Paper 26.1
-- Gradle wrapper included for building from source
+| Requirement | Version |
+| --- | --- |
+| Java | **25** |
+| Paper | **26.1.x** |
+| Model format | Blockbench `.bbmodel` |
 
-## Installation
+Osmium is currently built against the Paper `26.1.2` development bundle.
 
-1. Download the latest Osmium JAR from the repository Releases page.
-2. Stop your Paper server.
-3. Put the JAR into your server's `plugins/` folder.
-4. Start the server once so Osmium can generate its folders and config.
-5. Place your `.bbmodel` files into:
+## Quick start
 
-   ```txt
-   plugins/Osmium/blueprints/
-   ```
+### 1. Install Osmium
 
-6. Run:
+Download the latest plugin JAR from [GitHub Releases](https://github.com/aliceblackrose/osmium/releases/latest), then place it in your server's `plugins/` directory.
 
-   ```txt
-   /om reload
-   /om pack
-   ```
+Start the server once so Osmium can create its files and directories.
 
-7. Apply the generated resource pack from:
+### 2. Add a Blockbench model
 
-   ```txt
-   plugins/Osmium/resource_pack/
-   ```
+Place your `.bbmodel` file in:
 
-The generated pack will include a normal `pack.zip` and a versioned `pack-<hash>.zip`.
+```text
+plugins/Osmium/blueprints/
+```
+
+### 3. Reload models and generate the resource pack
+
+```text
+/om reload
+/om pack
+```
+
+Osmium writes the generated pack to:
+
+```text
+plugins/Osmium/resource_pack/
+```
+
+The output includes:
+
+```text
+pack.zip
+pack-<hash>.zip
+```
+
+Apply or distribute the generated resource pack before spawning models.
+
+### 4. Spawn a model
+
+List the models Osmium loaded:
+
+```text
+/om list
+```
+
+Spawn one at your location:
+
+```text
+/om spawn <model>
+```
+
+Or attach a model to a newly spawned mob:
+
+```text
+/om spawnmob zombie <model>
+```
 
 ## Commands
 
-Osmium commands require `osmium.admin` or the legacy `modelenginelike.admin` permission.
+All Osmium commands require `osmium.admin`. The legacy `modelenginelike.admin` permission is also accepted for compatibility.
 
 | Command | Description |
 | --- | --- |
-| `/om reload` | Reloads config and models, then removes active runtime models |
-| `/om pack` | Generates the resource pack |
-| `/om list` | Lists loaded models |
-| `/om spawn <model> [animation]` | Spawns a standalone runtime model at your location |
-| `/om spawnmob <entity_type> <model> [animation]` | Spawns a living mob with an Osmium model attached |
-| `/om play <runtime_id> <animation>` | Plays an animation on a spawned runtime model |
-| `/om remove <runtime_id>` | Removes a specific runtime model |
-| `/om remove all` | Removes all active runtime models |
-| `/om debug <model>` | Shows model debug info, including cubes, parts, hitboxes, textures, and UV data |
-
-## Configuration
-
-Default config:
-
-```yml
-namespace: osmium
-base-item: PAPER
-custom-model-data-start: 100000
-pack-format: 84
-
-blueprints-folder: blueprints
-resource-pack-folder: resource_pack
-
-auto-generate-pack-on-reload: true
-
-render:
-  interpolation-duration: 1
-  teleport-duration: 1
-  view-range: 64.0
-  shadow-enabled: true
-  shadow-radius: 0.0
-  shadow-strength: 0.75
-  brightness-override: false
-  brightness-block: 15
-  brightness-sky: 15
-  scale: 1.0
-  ground-align: true
-```
-
-### Important options
-
-| Option | Description |
-| --- | --- |
-| `namespace` | Namespace used for generated assets |
-| `base-item` | Minecraft item used as the model carrier |
-| `custom-model-data-start` | First custom model data value assigned to generated model parts |
-| `pack-format` | Resource-pack format written to `pack.mcmeta` |
-| `blueprints-folder` | Folder scanned for `.bbmodel` files |
-| `resource-pack-folder` | Folder where generated resource pack files are written |
-| `auto-generate-pack-on-reload` | Automatically regenerates the pack when Osmium reloads |
-| `render.view-range` | Display entity view range |
-| `render.shadow-enabled` | Enables one native display shadow per model |
-| `render.shadow-radius` | Shadow radius; `0.0` automatically sizes it from the model's X/Z footprint and render scale |
-| `render.shadow-strength` | Native shadow opacity/strength from `0.0` to `1.0` |
-| `render.brightness-override` | When `false`, use vanilla world lighting; when `true`, force the block/sky brightness values below |
-| `render.brightness-block` | Fixed block-light override used when `render.brightness-override` is enabled |
-| `render.brightness-sky` | Fixed sky-light override used when `render.brightness-override` is enabled |
-| `render.scale` | Runtime render scale |
-| `render.ground-align` | Aligns rendered models to the ground |
-
-Osmium emits the shadow from a single root-anchored display instead of every model part. This avoids stacking many identical shadows at the same entity anchor. Native Minecraft display shadows are soft entity shadows; they are not geometry-projected or ray-traced shadows.
-
-## Model workflow
-
-1. Create or export a `.bbmodel` file from Blockbench.
-2. Copy it into:
-
-   ```txt
-   plugins/Osmium/blueprints/
-   ```
-
-3. Reload Osmium:
-
-   ```txt
-   /om reload
-   ```
-
-4. Generate the resource pack:
-
-   ```txt
-   /om pack
-   ```
-
-5. Apply the generated resource pack to your client/server.
-6. List loaded models:
-
-   ```txt
-   /om list
-   ```
-
-7. Spawn a model:
-
-   ```txt
-   /om spawn <model>
-   ```
-
-8. Spawn a mob with a model:
-
-   ```txt
-   /om spawnmob zombie <model>
-   ```
+| `/om reload` | Reload configuration and models, then remove active runtime models. |
+| `/om pack` | Generate the resource pack. |
+| `/om list` | List loaded models. |
+| `/om spawn <model> [animation]` | Spawn a standalone runtime model at your location. |
+| `/om spawnmob <entity_type> <model> [animation]` | Spawn a living mob with an Osmium model attached. |
+| `/om play <runtime_id> <animation>` | Play an animation on an existing runtime model. |
+| `/om remove <runtime_id>` | Remove one runtime model. |
+| `/om remove all` | Remove all active runtime models. |
+| `/om debug <model>` | Show model, cube, hitbox, texture, UV, and animation debug information. |
 
 ## Animations
 
-Osmium can play animations from loaded models.
+Animations are read from the loaded Blockbench model and can be started when the model is spawned:
 
-```txt
-/om play <runtime_id> <animation>
-```
-
-When spawning a model, you can also provide the starting animation:
-
-```txt
+```text
 /om spawn <model> idle
 /om spawnmob zombie <model> walk
 ```
 
-For mob-attached models, Osmium attempts to use common animation names such as:
+You can also change the animation of an existing runtime model:
 
-- `idle`, `stand`, `standing`
-- `walk`, `walking`, `move`, `moving`, `run`, `running`
-- `talk`, `talking`, `speak`, `speaking`, `interact`
-- `attack`, `attacking`, `bite`, `melee`, `shoot`
-- `hurt`, `damaged`, `damage`, `hit`
-- `death`, `die`, `dying`
-
-## Building from source
-
-Clone the repository:
-
-```bash
-git clone https://github.com/aliceblackrose/osmium.git
-cd osmium
+```text
+/om play <runtime_id> <animation>
 ```
 
-Build with Gradle:
+For mob-attached models, Osmium recognizes common animation-name groups when selecting behavior automatically:
 
-```bash
-./gradlew clean build
-```
+| Behavior | Common names |
+| --- | --- |
+| Idle | `idle`, `stand`, `standing` |
+| Movement | `walk`, `walking`, `move`, `moving`, `run`, `running` |
+| Interaction | `talk`, `talking`, `speak`, `speaking`, `interact` |
+| Attack | `attack`, `attacking`, `bite`, `melee`, `shoot` |
+| Damage | `hurt`, `damaged`, `damage`, `hit` |
+| Death | `death`, `die`, `dying` |
 
-The compiled JAR will be in:
+## Configuration
 
-```txt
-build/libs/
-```
+Osmium creates `plugins/Osmium/config.yml` on first launch. The source defaults live in [`src/main/resources/config.yml`](src/main/resources/config.yml).
 
-On Windows, use:
+The most commonly changed options are:
 
-```bat
-gradlew.bat clean build
-```
+| Option | Purpose |
+| --- | --- |
+| `namespace` | Namespace used by generated resource-pack assets. |
+| `base-item` | Minecraft item used as the generated model-part carrier. |
+| `custom-model-data-start` | First custom-model-data value reserved for generated parts. |
+| `pack-format` | Resource-pack format written to `pack.mcmeta`. |
+| `blueprints-folder` | Directory scanned for `.bbmodel` files. |
+| `resource-pack-folder` | Directory used for generated pack files. |
+| `auto-generate-pack-on-reload` | Regenerate the pack whenever `/om reload` runs. |
+| `render.view-range` | Display-entity view range. |
+| `render.scale` | Global runtime render scale. |
+| `render.ground-align` | Align models to the ground. |
+| `render.shadow-enabled` | Enable the model's native display shadow. |
+| `render.shadow-radius` | Shadow radius. `0.0` automatically derives it from the model footprint. |
+| `render.shadow-strength` | Native shadow opacity from `0.0` to `1.0`. |
+| `render.brightness-override` | Use fixed block/sky brightness instead of vanilla world lighting. |
+
+Osmium emits a single root-anchored native display shadow per model instead of a shadow for every model part. These are Minecraft's normal soft display-entity shadows; they are not geometry-projected or ray-traced shadows.
 
 ## Using Osmium as a dependency
 
-Osmium is published through JitPack. Add JitPack to your repositories:
+Osmium can be consumed through JitPack.
+
+Add JitPack to your repositories:
 
 ```kotlin
 dependencyResolutionManagement {
@@ -223,15 +181,15 @@ dependencyResolutionManagement {
 }
 ```
 
-Then depend on a Git tag or commit:
+Then add Osmium as a compile-only dependency:
 
 ```kotlin
 dependencies {
-    compileOnly("com.github.aliceblackrose:osmium:<tag>")
+    compileOnly("com.github.aliceblackrose:osmium:<tag-or-commit>")
 }
 ```
 
-For the latest `master` snapshot:
+For development against the current `master` branch:
 
 ```kotlin
 dependencies {
@@ -239,33 +197,52 @@ dependencies {
 }
 ```
 
+For reproducible builds, prefer an immutable Git tag or commit instead of a moving snapshot.
+
 Use `compileOnly` when Osmium is installed separately as a Paper plugin at runtime.
 
-## Development notes
+## Building from source
 
-Osmium uses:
+Clone the repository:
 
-- Java 25
-- Gradle Kotlin DSL
-- Paper API
-- Bukkit display entities
-- Item display entities for visual model parts
-- Interaction entities for model hitboxes
-- Generated resource-pack item models and custom model data
+```bash
+git clone https://github.com/aliceblackrose/osmium.git
+cd osmium
+```
 
-### Architecture roadmap
+Build with the included Gradle wrapper:
 
-The planned architecture refactor is documented in:
+```bash
+./gradlew clean build
+```
 
-- [`docs/ROADMAP.md`](docs/ROADMAP.md) - phased implementation roadmap, acceptance criteria, PR sequence, and risk register.
-- [`docs/ARCHITECTURE_PLAN.md`](docs/ARCHITECTURE_PLAN.md) - proposed model/compiler/runtime/API/threading architecture and migration strategy.
-- [`docs/ANIMATION_ENGINE.md`](docs/ANIMATION_ENGINE.md) - current compiled animation and 40 Hz packet-rendering design.
+On Windows:
 
-The refactor prioritizes an immutable compiled-model pipeline, decomposition of `RuntimeModel`, and a stable `osmium.api` surface before larger feature expansion.
+```bat
+gradlew.bat clean build
+```
+
+Compiled artifacts are written to:
+
+```text
+build/libs/
+```
+
+## Architecture and development
+
+Osmium uses Java 25, Gradle Kotlin DSL, Paper API, Bukkit display entities, interaction entities, and generated custom-model-data assets.
+
+More detailed implementation notes live under [`docs/`](docs/):
+
+- [`ROADMAP.md`](docs/ROADMAP.md) — phased implementation roadmap, acceptance criteria, PR sequence, and risk register.
+- [`ARCHITECTURE_PLAN.md`](docs/ARCHITECTURE_PLAN.md) — model/compiler/runtime/API architecture and migration strategy.
+- [`ANIMATION_ENGINE.md`](docs/ANIMATION_ENGINE.md) — compiled animation pipeline and packet-rendering design.
+
+The current architecture work prioritizes an immutable compiled-model pipeline, decomposition of `RuntimeModel`, and a stable `osmium.api` surface before larger feature expansion.
 
 ## Permissions
 
-```yml
+```yaml
 osmium.admin:
   default: op
 
@@ -273,12 +250,8 @@ modelenginelike.admin:
   default: op
 ```
 
-`modelenginelike.admin` is kept as a legacy permission alias.
-
-## Status
-
-Osmium is in active development. Expect changes to model loading, resource-pack generation, runtime rendering, commands, and configuration as the project evolves.
+`modelenginelike.admin` exists only as a legacy compatibility alias.
 
 ## License
 
-Osmium is licensed under the GNU General Public License v3.0 (GPL-3.0). See [`LICENSE`](LICENSE) for the full license text.
+Osmium is licensed under the [GNU General Public License v3.0](LICENSE).
